@@ -97,7 +97,7 @@ def download_chunk(client, file_name, offset, length, progress, task_id):
             # time.sleep(0.005)
             try:
                 # time.sleep(1)
-                client.settimeout(15)
+                client.settimeout(5)
                 data, _ = client.recvfrom(2048)
                 protocol_name, chunk_id, checksum, payload_length, payload = GUDP_parse(data)
                 # LOG.info(f"Chunk {chunk_id} received")
@@ -106,13 +106,10 @@ def download_chunk(client, file_name, offset, length, progress, task_id):
                     # LOG.info(chunk_id)
                     client.sendto(create_packet_udp(b'ACK', chunk_id), SERVER_ADDR)
                     break
-                if checksum != calculate_hash_sha256_checksum(payload):
-                    continue
-                # if chunk_id == last_chunk_id:
-                #     LOG.info(f"Last chunk {chunk_id} received")
                 
                 if chunk_id == expected_chunk_id:
-                    
+                    if checksum != calculate_hash_sha256_checksum(payload):
+                        continue  
                     chunk_downloaded = len(payload)
                     f.seek(chunk_id * 1024)
                     f.write(payload)
@@ -124,8 +121,15 @@ def download_chunk(client, file_name, offset, length, progress, task_id):
                     if chunk_received % 32 == 0 or chunk_id == last_chunk_id:
                         ack_packet = create_packet_udp(b'ACK', chunk_id)
                         client.sendto(ack_packet, SERVER_ADDR)
+                        
+                # if checksum != calculate_hash_sha256_checksum(payload):
+                #     continue
+                # if chunk_id == last_chunk_id:
+                #     LOG.info(f"Last chunk {chunk_id} received")
+                
                 # if resend == b'N':
             except:
+                # LOG.info(f"Resend chunk {expected_chunk_id}")
                 continue
     # os.remove("chunk_error_tmp/" + file_name + f".part{chunk_index}")
     # disconnect(client, client_ip, client_port, SERVER_ADDR)

@@ -19,7 +19,7 @@ LOG = lib.LOG
 
 CLIENT_HOST = globals.CLIENT_HOST  
 CLIENT_PORT = globals.CLIENT_PORT
-print(CLIENT_HOST, CLIENT_PORT)
+# print(CLIENT_HOST, CLIENT_PORT)
 
 def main():
     #prepare client and server

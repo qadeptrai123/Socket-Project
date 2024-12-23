@@ -70,7 +70,7 @@ def handle_send_file(connection, chunk_size, file_name, offset, length, client_a
                 bytes_readed += len(data)
             # LOG.info(f"Bytes readed: {bytes_readed}, Length: {length}")
             try:
-                connection.settimeout(3)
+                connection.settimeout(5)
                 data, client_address = connection.recvfrom(2048)
                 protocol_name, ack_number, checksum, content_length, content = GUDP_parse(data)
                 
